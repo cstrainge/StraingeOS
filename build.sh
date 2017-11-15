@@ -1,6 +1,14 @@
 #!/bin/bash
 
 
+
+TARGET=i686-elf
+CC=${TARGET}-gcc
+CXX=${TARGET}-g++
+AS=${TARGET}-as
+
+
+
 rm -rf ./obj
 mkdir -p `realpath ./obj`
 
@@ -12,12 +20,12 @@ objList=""
 function assemble
 {
     source=`realpath ./src/${1}.s`
-    object=`realpath ./obj/${1}.s.o`
+    object=`realpath ./obj/${1}.o`
 
     echo "Assemble $source"
-    objList="$object $objList"
+    objList="$objList $object"
 
-    i686-elf-as "$source" -o "$object"
+    $AS "$source" -o "$object"
 
     if [ ! $? ]
     then
@@ -31,18 +39,30 @@ function assemble
 function compile
 {
     source=`realpath ./src/${1}.cpp`
-    object=`realpath ./obj/${1}.cpp.o`
+    object=`realpath ./obj/${1}.o`
 
     echo "Compile $source"
-    objList="$object $objList"
+    objList="$objList $object"
 
-    i686-elf-g++ -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++11 -c "${source}" -o "${object}"
+    $CXX -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++11 -c "${source}" -o "${object}"
 
     if [ ! $? ]
     then
         echo "Compile failed."
         exit 1
     fi
+}
+
+
+
+function appendCrtObject
+{
+    name="$1.o"
+
+    objFilePath=`$CXX --print-file-name=$name`
+
+    echo "Include CRT file $objFilePath"
+    objList="$objList $objFilePath"
 }
 
 
@@ -58,16 +78,22 @@ rm -rf ${stagingDir}/*
 mkdir -p ${bootDir} ${grubDir}
 
 
-assemble boot
-compile terminal
-compile kernel
 
+assemble         crti
+appendCrtObject  crtbegin
+
+assemble         boot
+compile          terminal
+compile          kernel
+
+appendCrtObject  crtend
+assemble         crtn
 
 
 
 echo "Link $kernelPath"
 
-i686-elf-gcc -T linker.ld -o $kernelPath -ffreestanding -O2 -nostdlib  $objList -lgcc
+$CXX -T linker.ld -o $kernelPath -ffreestanding -O2 -nostdlib  $objList -lgcc
 
 
 

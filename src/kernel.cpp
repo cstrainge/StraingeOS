@@ -7,10 +7,13 @@
 
 
 
+Terminal_t screen;
+
+
+
+
 extern "C" void kernelMain(void)
 {
-    Terminal_t screen;
-
     auto background = VgaColorValue_t::LightGrey;
 
     auto greyText = VgaColor_t(VgaColorValue_t::DarkGrey, background);
@@ -18,9 +21,7 @@ extern "C" void kernelMain(void)
     auto yellow = VgaColor_t(VgaColorValue_t::Yellow, background);
     auto red = VgaColor_t(VgaColorValue_t::Red, background);
 
-
     screen.Clear(background);
-
 
     screen.WriteString("\n Strainge", yellow);
     screen.WriteString("OS", red);
