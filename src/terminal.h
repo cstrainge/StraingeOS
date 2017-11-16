@@ -14,11 +14,15 @@ class Terminal_t
         size_t y;
 
         uint16_t* bufferPtr;
-    
+
     public:
         Terminal_t();
         Terminal_t(const Terminal_t& term) = delete;
         Terminal_t(Terminal_t&& term) = delete;
+
+        virtual ~Terminal_t()
+        {
+        }
 
     public:
         Terminal_t& operator =(const Terminal_t& term) = delete;

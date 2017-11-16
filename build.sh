@@ -1,11 +1,9 @@
 #!/bin/bash
 
 
+source ../sotc/env.sh
 
-TARGET=i686-elf
-CC=${TARGET}-gcc
-CXX=${TARGET}-g++
-AS=${TARGET}-as
+
 
 
 
@@ -17,6 +15,14 @@ objList=""
 
 
 
+function fail
+{
+    echo "$1" >&2
+    exit 1
+}
+
+
+
 function assemble
 {
     source=`realpath ./src/${1}.s`
@@ -25,13 +31,7 @@ function assemble
     echo "Assemble $source"
     objList="$objList $object"
 
-    $AS "$source" -o "$object"
-
-    if [ ! $? ]
-    then
-        echo "Assemble failed."
-        exit 1
-    fi
+    $AS "$source" -o "$object" || fail "Assemble failed."
 }
 
 
@@ -44,26 +44,73 @@ function compile
     echo "Compile $source"
     objList="$objList $object"
 
-    $CXX -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++11 -c "${source}" -o "${object}"
+    $CXX -ffreestanding \
+         -O2 \
+         -Wall \
+         -Wextra \
+         -fno-exceptions \
+         -fno-rtti \
+         -std=c++11 \
+         -c "${source}" \
+         -o "${object}" || fail "Compile failed."
+}
 
-    if [ ! $? ]
+
+
+function addCrtObject
+{
+    name="$1.o"
+
+    objFilePath=`$CXX --print-file-name=$name` || fail "Search failed."
+
+    echo "Search $objFilePath"
+    objList="$objList $objFilePath"
+}
+
+
+
+function link
+{
+    echo "Link $kernelPath"
+
+    $CXX -T linker.ld \
+         -o $kernelPath \
+         -ffreestanding \
+         -O2 \
+         -nostdlib  $objList \
+         -lgcc || fail "Link failed."
+}
+
+
+
+function checkMultiBoot
+{
+    if grub-file --is-x86-multiboot $kernelPath
     then
-        echo "Compile failed."
+        echo "Multi-Boot kernel comfirmed."
+    else
+        echo "Kernel is not multiboot."
         exit 1
     fi
 }
 
 
 
-function appendCrtObject
+function createIso
 {
-    name="$1.o"
+    echo "Generating StraingeOS.iso"
 
-    objFilePath=`$CXX --print-file-name=$name`
-
-    echo "Include CRT file $objFilePath"
-    objList="$objList $objFilePath"
+    cp grub.cfg ${grubDir}/grub.cfg
+    grub-mkrescue -o StraingeOS.iso ${stagingDir} 2> /dev/null || fail "Could not create OS .iso"
 }
+
+
+function execute
+{
+    echo "Starting emulator."
+    qemu-system-i386 -cdrom StraingeOS.iso & #|| fail "Could not start emulator."
+}
+
 
 
 
@@ -79,41 +126,23 @@ mkdir -p ${bootDir} ${grubDir}
 
 
 
-assemble         crti
-appendCrtObject  crtbegin
 
-assemble         boot
-compile          terminal
-compile          kernel
+assemble      boot
 
-appendCrtObject  crtend
-assemble         crtn
+assemble      crti
+addCrtObject  crtbegin
 
+compile       terminal
+compile       kernel
 
+compile       cppSupport
 
-echo "Link $kernelPath"
+addCrtObject  crtend
+assemble      crtn
 
-$CXX -T linker.ld -o $kernelPath -ffreestanding -O2 -nostdlib  $objList -lgcc
+link
 
+checkMultiBoot
 
-
-echo "Checking kernel image."
-if grub-file --is-x86-multiboot $kernelPath
-then
-    echo "Multi-Boot kernel comfirmed."
-else
-    echo "Kernel is not multiboot."
-    exit 1
-fi
-
-
-
-echo "Building StraingeOS.iso"
-
-cp grub.cfg ${grubDir}/grub.cfg
-grub-mkrescue -o StraingeOS.iso ${stagingDir}
-
-
-
-echo "Starting emulator."
-qemu-system-i386 -cdrom StraingeOS.iso
+createIso
+execute

@@ -28,12 +28,12 @@
 
 
 # --------------------------------------------------------------------------------------------------
-#  Reserve space for a 16k stack.
+#  Reserve space for a 2 MB stack.
 # --------------------------------------------------------------------------------------------------
 .section .bss
 .align 16
 
-stackBottom: .skip 16384
+stackBottom: .skip 0x200000
 stackTop:
 
 
@@ -50,11 +50,19 @@ stackTop:
                 # Setup the expected stack register, and call our main function.
 _start:         mov         $stackTop, %esp
 
-                call        _init       # Call all of the pre-init functions.
-                call        kernelMain  # Our actual main.
-                call        _fini       # Call all of the cleanup functions.
+                # Call all of the pre-init functions, and our Kernel's main function.
+                call        _init
+                call        kernelMain
 
-                // If main ever returns simply go into an infinite loop.
+                # Make sure that all of our C++ destructors get called.
+                subl        $4, %esp
+                movl        $0x00, (%esp)
+                call        __cxa_finalize
+
+                # Call all of the remaining cleanup functions.
+                call        _fini
+
+                # Finally, go into an infiinite loop until the machine is reset.
                 cli
 1:              hlt
                 jmp 1b
