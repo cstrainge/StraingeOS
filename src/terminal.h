@@ -1,6 +1,6 @@
 
-#ifndef _TERMINAL_INC_
-#define _TERMINAL_INC_
+#ifndef KERNEL_TERMINAL_INC_
+#define KERNEL_TERMINAL_INC_
 
 
 
@@ -38,7 +38,49 @@ class Terminal_t
     public:
         void IncLine();
         void IncColumn();
+
+    public:
+        class TerminalPrintAdapter_t : public PrintAdapter_t
+        {
+            public:
+                Terminal_t& terminal;
+
+            public:
+                TerminalPrintAdapter_t(Terminal_t& newTerminal)
+                : PrintAdapter_t(),
+                  terminal(newTerminal)
+                {
+                }
+
+                ~TerminalPrintAdapter_t() override
+                {
+                }
+
+            public:
+                void WriteString(const PrintInfo_t& info, const char_t* string) override
+                {
+                    auto intColor = static_cast<uint8_t>(info.backColor) >> 4;
+
+                    auto fg = static_cast<VgaColorValue_t>(info.foreColor);
+                    auto bg = static_cast<VgaColorValue_t>(intColor);
+
+                    auto color = VgaColor_t(fg, bg);
+
+                    terminal.WriteString(string, color);
+                }
+        };
 };
+
+
+
+template <typename... Args_t>
+inline void Print(Terminal_t& terminal, Args_t... args)
+{
+    Terminal_t::TerminalPrintAdapter_t adapter(terminal);
+
+    Print(PrintInfo_t(adapter), args...);
+}
+
 
 
 

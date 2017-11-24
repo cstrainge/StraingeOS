@@ -132,6 +132,8 @@ assemble      boot
 assemble      crti
 addCrtObject  crtbegin
 
+compile       string
+compile       printing
 compile       terminal
 compile       kernel
 

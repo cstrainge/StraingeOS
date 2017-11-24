@@ -1,5 +1,7 @@
 
 #include "kernelDefs.h"
+#include "string.h"
+#include "printing.h"
 #include "vgaColor.h"
 #include "terminal.h"
 

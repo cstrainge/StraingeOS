@@ -1,6 +1,6 @@
 
-#ifndef _VGA_COLOR_INC_
-#define _VGA_COLOR_INC_
+#ifndef KERNEL_VGA_COLOR_INC_
+#define KERNEL_VGA_COLOR_INC_
 
 
 
