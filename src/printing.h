@@ -274,6 +274,7 @@ void Print(const PrintInfo_t& info, int32_t value);
 void Print(const PrintInfo_t& info, float32_t value);
 void Print(const PrintInfo_t& info, float64_t value);
 void Print(const PrintInfo_t& info, void* value);
+void Print(const PrintInfo_t& info, const void* value);
 void Print(const PrintInfo_t& info, const Version_t& version);
 
 

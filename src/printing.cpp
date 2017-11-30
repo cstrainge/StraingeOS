@@ -250,8 +250,17 @@ void Print(const PrintInfo_t& /*info*/, float64_t /*value*/)
 
 
 
-void Print(const PrintInfo_t& /*info*/, void* /*value*/)
+void Print(const PrintInfo_t& info, void* value)
 {
+    Print(info, static_cast<const void*>(value));
+}
+
+
+
+void Print(const PrintInfo_t& info, const void* value)
+{
+    Print(info, PrintSeperator_t::None,
+          "0x", NumFmt_t(NumRadix_t::Hex), reinterpret_cast<uint32_t>(value));
 }
 
 

@@ -1,5 +1,6 @@
 
 #include "kernelDefs.h"
+#include "multiBoot.h"
 #include "string.h"
 #include "printing.h"
 #include "vgaColor.h"
@@ -7,37 +8,33 @@
 
 
 
-
-static const uint32_t MBExpectedMagic = 0x36d76289;
-
-
-
 Terminal_t screen;
 
 
 
-
-extern "C" void KernelMain(uint32_t magic, void* infoPtr)
+extern "C" void KernelMain(void)
 {
     screen.Clear(VgaColorValue_t::LightGrey);
 
-    Print(screen, BC_LGry,
+    Print(screen, BC_LGry, PrintSeperator_t::None,
           nl,
-          FC_Yel, "Strainge", FC_Red, "OS", FC_DGry, "Kernel booted.", nl,
+          FC_Yel, " Strainge", FC_Red, "OS", FC_DGry, " kernel booted.", nl,
           nl,
-          FC_DGry, "Multi-Boot magic:", FC_Blu, Hex, magic, nl,
-          FC_DGry, "Multi-Boot info: ", FC_Blu, Hex, (uint32_t)infoPtr, nl,
+          FC_DGry, " Multi-Boot magic: ", FC_Blu, Hex, MB_Magic, nl,
+          FC_DGry, " Multi-Boot info:  ", FC_Blu, Hex, MB_Info, nl,
           nl);
 
-    if (magic != MBExpectedMagic)
+    if (MB_Magic != MB_ExpectedMagic)
     {
-        Print(screen, BC_LGry, FC_Red, " Multi-boot detection failed, expected value:",
-              Hex, MBExpectedMagic);
+        Print(screen, BC_LGry, FC_Red, PrintSeperator_t::None,
+              " Multi-boot detection failed, expected value: 0x", Hex, MB_ExpectedMagic);
 
         return;
     }
 
 
-    Print(screen, BC_LGry, FC_Grn, " Multi-boot detection success.", nl,
+    void* testPtr = (void*)KernelMain;
+
+    Print(screen, BC_LGry, FC_DGry, " Multi-boot detection success.", nl, testPtr,
           nl);
 }

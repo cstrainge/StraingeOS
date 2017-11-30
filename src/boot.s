@@ -15,12 +15,13 @@
 
 
 
-.set MB_MAGIC,    0xe85250d6
-.set MB_ARCH,     0
-.set MB_LENGTH,   (mb_header_end - mb_header)
-.set MB_CHECKSUM, -(MB_MAGIC + MB_ARCH + MB_LENGTH)
+.set MB_MAGIC,          0xe85250d6
+.set MB_ARCH,           0
+.set MB_LENGTH,         (mb_header_end - mb_header)
+.set MB_CHECKSUM,       -(MB_MAGIC + MB_ARCH + MB_LENGTH)
 
-.set MB_TAG_END,  0
+.set MB_TAG_MEMORY_MAP, 6
+.set MB_TAG_END,        0
 
 
 
@@ -30,7 +31,12 @@ mb_header:      # Multi-boot 2 header.
                 .long MB_LENGTH
                 .long MB_CHECKSUM
 
-                # TAGS...
+                # List of tags to request extra information from the boot loader.
+mb_mm_tag:      .long MB_TAG_MEMORY_MAP
+                .long mb_mm_tag_end - mb_mm_tag # Size.
+                .long # Entry size.
+                .long # Entry version.
+mb_mm_tag_end:
 
                 # End tag.
                 .short MB_TAG_END
@@ -46,7 +52,7 @@ mb_header_end:
 .section .bss
 .align 16
 
-stackBottom: .skip 0x200000
+stackBottom: .skip 0x4000
 stackTop:
 
 
@@ -66,13 +72,14 @@ stackTop:
 _start:         # Setup the expected stack register, and call our main function.
                 mov         $stackTop, %esp
 
+                # Save our multi-boot info.
+                mov         %eax, MB_Magic
+                mov         %ebx, MB_Info
+
                 # Call all of the pre-init functions.
                 call        _init
 
-                # Now call the Kernel's main function and pass the multi-boot info to it.
-                push        %ebx
-                push        %eax
-
+                # Now call the Kernel's main function.
                 call        KernelMain
 
                 # Make sure that all of our C++ destructors get called.
@@ -91,3 +98,17 @@ halt_loop:      hlt
 
 
 .size _start, . - _start
+
+
+
+# --------------------------------------------------------------------------------------------------
+#  The actual start code, call into our Kernels main C function.
+# --------------------------------------------------------------------------------------------------
+.section .data
+.align 4
+
+.global MB_Magic, MB_Info
+
+
+MB_Magic: .long 0
+MB_Info:  .long 0
