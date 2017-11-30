@@ -33,8 +33,6 @@ extern "C" void KernelMain(void)
     }
 
 
-    void* testPtr = (void*)KernelMain;
-
-    Print(screen, BC_LGry, FC_DGry, " Multi-boot detection success.", nl, testPtr,
+    Print(screen, BC_LGry, FC_DGry, " Multi-boot detection success.", nl,
           nl);
 }
