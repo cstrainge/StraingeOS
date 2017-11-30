@@ -42,9 +42,9 @@ struct NumFmt_t
     char_t padChar;
 
 
-    inline NumFmt_t(size_t newPadding = defaultPadding,
-                    char_t newPadChar = defaultPadChar,
-                    Align_t newAlignment = defaultAlignment)
+    inline constexpr NumFmt_t(size_t newPadding = defaultPadding,
+                              char_t newPadChar = defaultPadChar,
+                              Align_t newAlignment = defaultAlignment)
     : radix(defaultRadix),
       alignment(newAlignment),
       padding(newPadding),
@@ -54,10 +54,10 @@ struct NumFmt_t
 
 
 
-    inline NumFmt_t(NumRadix_t newRadix,
-                    size_t newPadding = defaultPadding,
-                    char_t newPadChar = defaultPadChar,
-                    Align_t newAlignment = defaultAlignment)
+    inline constexpr NumFmt_t(NumRadix_t newRadix,
+                              size_t newPadding = defaultPadding,
+                              char_t newPadChar = defaultPadChar,
+                              Align_t newAlignment = defaultAlignment)
     : radix(newRadix),
       alignment(newAlignment),
       padding(newPadding),
@@ -78,9 +78,9 @@ struct StrFmt_t
     size_t padding;
     char_t padChar;
 
-    inline StrFmt_t(size_t newPadding = defaultPadding,
-                    char_t newPadChar = defaultPadChar,
-                    Align_t newAlignment = defaultAlignment)
+    inline constexpr StrFmt_t(size_t newPadding = defaultPadding,
+                              char_t newPadChar = defaultPadChar,
+                              Align_t newAlignment = defaultAlignment)
     : alignment(newAlignment),
       padding(newPadding),
       padChar(newPadChar)
@@ -165,6 +165,43 @@ class PrintAdapter_t;
 
 constexpr auto nl = "\n";
 
+constexpr auto FC_Blk  = FColor_t::Black;
+constexpr auto FC_Blu  = FColor_t::Blue;
+constexpr auto FC_Grn  = FColor_t::Green;
+constexpr auto FC_Cyn  = FColor_t::Cyan;
+constexpr auto FC_Red  = FColor_t::Red;
+constexpr auto FC_Mag  = FColor_t::Magenta;
+constexpr auto FC_Brn  = FColor_t::Brown;
+constexpr auto FC_LGry = FColor_t::LightGrey;
+constexpr auto FC_DGry = FColor_t::DarkGrey;
+constexpr auto FC_LBlu = FColor_t::LightBlue;
+constexpr auto FC_LGrn = FColor_t::LightGreen;
+constexpr auto FC_LCyn = FColor_t::LightCyan;
+constexpr auto FC_LRed = FColor_t::LightRed;
+constexpr auto FC_LMag = FColor_t::LightMagenta;
+constexpr auto FC_Yel  = FColor_t::Yellow;
+constexpr auto FC_Wht  = FColor_t::White;
+
+constexpr auto BC_Blk  = BColor_t::Black;
+constexpr auto BC_Blu  = BColor_t::Blue;
+constexpr auto BC_Grn  = BColor_t::Green;
+constexpr auto BC_Cyn  = BColor_t::Cyan;
+constexpr auto BC_Red  = BColor_t::Red;
+constexpr auto BC_Mag  = BColor_t::Magenta;
+constexpr auto BC_Brn  = BColor_t::Brown;
+constexpr auto BC_LGry = BColor_t::LightGrey;
+constexpr auto BC_DGry = BColor_t::DarkGrey;
+constexpr auto BC_LBlu = BColor_t::LightBlue;
+constexpr auto BC_LGrn = BColor_t::LightGreen;
+constexpr auto BC_LCyn = BColor_t::LightCyan;
+constexpr auto BC_LRed = BColor_t::LightRed;
+constexpr auto BC_LMag = BColor_t::LightMagenta;
+constexpr auto BC_Yel  = BColor_t::Yellow;
+constexpr auto BC_Wht  = BColor_t::White;
+
+constexpr auto Bin     = NumFmt_t(NumRadix_t::Bin);
+constexpr auto Dec     = NumFmt_t(NumRadix_t::Dec);
+constexpr auto Hex     = NumFmt_t(NumRadix_t::Hex);
 
 
 struct PrintInfo_t
