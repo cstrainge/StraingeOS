@@ -1,29 +1,42 @@
 
 # --------------------------------------------------------------------------------------------------
-# Core bootstrap code.  Based off of http://wiki.osdev.org/Bare_Bones
+#  Core bootstrap code.  Based off of http://wiki.osdev.org/Bare_Bones
 # --------------------------------------------------------------------------------------------------
 
 
-.set ALIGN,    1<<0
-.set MEMINFO,  1<<1
-.set FLAGS,    ALIGN | MEMINFO
-.set MAGIC,    0x1BADB002
-.set CHECKSUM, -(MAGIC + FLAGS)
-
-
-
 # --------------------------------------------------------------------------------------------------
-#  The multi-boot header.  Used so GRUB can successfuly load our Kernel.
+#  The multi-boot 2 header.  Used so GRUB can successfuly load our Kernel.  We also use this
+#  structure to inform GRUB or any multi-boot compliant bootloader that we want additional
+#  information.
 # --------------------------------------------------------------------------------------------------
 
 .section .multiboot
-.align 4
+.align 8
 
 
-.long MAGIC      # The UBoot magic!
-.long FLAGS      # We want things aligned to pages, and be provided a memory map.
-.long CHECKSUM   # Another magic value computed to confirm to the bootloader that this kernel is
-                 #   real.
+
+.set MB_MAGIC,    0xe85250d6
+.set MB_ARCH,     0
+.set MB_LENGTH,   (mb_header_end - mb_header)
+.set MB_CHECKSUM, -(MB_MAGIC + MB_ARCH + MB_LENGTH)
+
+.set MB_TAG_END,  0
+
+
+
+mb_header:      # Multi-boot 2 header.
+                .long MB_MAGIC
+                .long MB_ARCH
+                .long MB_LENGTH
+                .long MB_CHECKSUM
+
+                # TAGS...
+
+                # End tag.
+                .short MB_TAG_END
+                .short 0
+                .short 8
+mb_header_end:
 
 
 
@@ -47,11 +60,19 @@ stackTop:
 .global _start
 .type _start, @function
 
-                # Setup the expected stack register, and call our main function.
-_start:         mov         $stackTop, %esp
 
-                # Call all of the pre-init functions, and our Kernel's main function.
+
+
+_start:         # Setup the expected stack register, and call our main function.
+                mov         $stackTop, %esp
+
+                # Call all of the pre-init functions.
                 call        _init
+
+                # Now call the Kernel's main function and pass the multi-boot info to it.
+                push        %ebx
+                push        %eax
+
                 call        kernelMain
 
                 # Make sure that all of our C++ destructors get called.
@@ -62,9 +83,11 @@ _start:         mov         $stackTop, %esp
                 # Call all of the remaining cleanup functions.
                 call        _fini
 
-                # Finally, go into an infiinite loop until the machine is reset.
+                # Finally, go into an infiinite loop until the machine is shutdown/reset.
                 cli
-1:              hlt
-                jmp 1b
+halt_loop:      hlt
+                jmp halt_loop
+
+
 
 .size _start, . - _start

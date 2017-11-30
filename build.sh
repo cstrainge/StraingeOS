@@ -85,11 +85,11 @@ function link
 
 function checkMultiBoot
 {
-    if grub-file --is-x86-multiboot $kernelPath
+    if grub-file --is-x86-multiboot2 $kernelPath
     then
-        echo "Multi-Boot kernel comfirmed."
+        echo "Multi-Boot 2 kernel comfirmed."
     else
-        echo "Kernel is not multiboot."
+        echo "Kernel is not multiboot 2 compliant."
         exit 1
     fi
 }

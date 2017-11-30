@@ -8,21 +8,36 @@
 
 
 
+static const uint32_t MBExpectedMagic = 0x36d76289;
+
+
+
 Terminal_t screen;
 
 
 
 
-extern "C" void kernelMain(void)
+extern "C" void kernelMain(uint32_t magic, void* infoPtr)
 {
     screen.Clear(VgaColorValue_t::LightGrey);
 
-    Print(screen,
-          BColor_t::LightGrey,
+    Print(screen, BC_LGry,
           nl,
-          FColor_t::Yellow,   " Strainge",
-          FColor_t::Red,      "OS",
-          FColor_t::DarkGrey, "Kernel booted.", nl,
+          FC_Yel, "Strainge", FC_Red, "OS", FC_DGry, "Kernel booted.", nl,
           nl,
-          FColor_t::LightBlue, " Greetings and hello world.");
+          FC_DGry, "Multi-Boot magic:", FC_Blu, Hex, magic, nl,
+          FC_DGry, "Multi-Boot info: ", FC_Blu, Hex, (uint32_t)infoPtr, nl,
+          nl);
+
+    if (magic != MBExpectedMagic)
+    {
+        Print(screen, BC_LGry, FC_Red, " Multi-boot detection failed, expected value:",
+              Hex, MBExpectedMagic);
+
+        return;
+    }
+
+
+    Print(screen, BC_LGry, FC_Grn, " Multi-boot detection success.", nl,
+          nl);
 }
