@@ -73,7 +73,7 @@ _start:         # Setup the expected stack register, and call our main function.
                 push        %ebx
                 push        %eax
 
-                call        kernelMain
+                call        KernelMain
 
                 # Make sure that all of our C++ destructors get called.
                 subl        $4, %esp

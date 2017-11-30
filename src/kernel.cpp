@@ -17,7 +17,7 @@ Terminal_t screen;
 
 
 
-extern "C" void kernelMain(uint32_t magic, void* infoPtr)
+extern "C" void KernelMain(uint32_t magic, void* infoPtr)
 {
     screen.Clear(VgaColorValue_t::LightGrey);
 
