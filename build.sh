@@ -135,6 +135,7 @@ addCrtObject  crtbegin
 compile       string
 compile       printing
 compile       terminal
+compile       multiBoot
 compile       kernel
 
 compile       cppSupport
