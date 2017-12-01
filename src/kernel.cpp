@@ -92,9 +92,9 @@ static void WalkTags(const void* startPtr)
                     auto bootPtr = reinterpret_cast<const MBBootDevice_t*>(tagPtr);
 
                     Print(screen, BC_LGry, PrintSeperator_t::None, " : ",
-                          "device: ", FC_Blu, Hex, bootPtr->biosDevice, Dec, FC_DGry,
-                          ", slice: ", FC_Blu, bootPtr->size, FC_DGry,
-                          ", part: ", FC_Blu, bootPtr->part, FC_DGry, ".");
+                          "device: ", FC_Blu, Hex, bootPtr->biosDevice, FC_DGry,
+                          ", part: ", FC_Blu, bootPtr->partition, FC_DGry,
+                          ", sub: ", FC_Blu, bootPtr->subPartition, FC_DGry, ".");
                 }
                 break;
 

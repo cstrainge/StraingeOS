@@ -59,8 +59,8 @@ struct MBMemInfo_t : public MBTag_t
 struct MBBootDevice_t : public MBTag_t
 {
     uint32_t biosDevice;
-    uint32_t slice;
-    uint32_t part;
+    uint32_t partition;
+    uint32_t subPartition;
 };
 
 
