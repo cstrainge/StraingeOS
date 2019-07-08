@@ -4,12 +4,12 @@
 # --------------------------------------------------------------------------------------------------
 
 .section .init
-                /* GCC will flesh out the contents of this function. */
+                # GCC will flesh out the contents of this function.
                 popl        %ebp
                 ret
 
 
 .section .fini
-                /* GCC will also fill out this function. */
+                # GCC will also fill out this function.
                 popl        %ebp
                 ret

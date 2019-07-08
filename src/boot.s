@@ -49,6 +49,7 @@ mb_header_end:
 # --------------------------------------------------------------------------------------------------
 #  Reserve space for a 2 MB stack.
 # --------------------------------------------------------------------------------------------------
+
 .section .bss
 .align 16
 
@@ -92,6 +93,7 @@ _start:         # Setup the expected stack register, and call our main function.
 
                 # Finally, go into an infiinite loop until the machine is shutdown/reset.
                 cli
+
 halt_loop:      hlt
                 jmp halt_loop
 
@@ -104,6 +106,7 @@ halt_loop:      hlt
 # --------------------------------------------------------------------------------------------------
 #  The actual start code, call into our Kernels main C function.
 # --------------------------------------------------------------------------------------------------
+
 .section .data
 .align 4
 

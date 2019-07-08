@@ -1,9 +1,19 @@
 #!/bin/bash
 
 
-source ../sotc/env.sh
+
+source "./tools_env.sh"
 
 
+
+
+export CXX="$TOOLS_GXX"
+export AS="$TOOLS_AS"
+
+
+
+echo "Using $TOOLS_AS"
+echo "Using $CXX"
 
 
 
@@ -28,10 +38,10 @@ function assemble
     source=`realpath ./src/${1}.s`
     object=`realpath ./obj/${1}.o`
 
-    echo "Assemble $source"
+    echo "Assemble $source with $AS"
     objList="$objList $object"
 
-    $AS "$source" -o "$object" || fail "Assemble failed."
+    $AS --32 "$source" -o "$object" || fail "Assemble failed."
 }
 
 
@@ -51,6 +61,7 @@ function compile
          -fno-exceptions \
          -fno-rtti \
          -std=c++11 \
+         -m32 \
          -c "${source}" \
          -o "${object}" || fail "Compile failed."
 }
@@ -61,9 +72,9 @@ function addCrtObject
 {
     name="$1.o"
 
-    objFilePath=`$CXX --print-file-name=$name` || fail "Search failed."
+    objFilePath=`$CXX -m32 --print-file-name=$name` || fail "Search failed."
 
-    echo "Search $objFilePath"
+    echo "Found CRT: $objFilePath"
     objList="$objList $objFilePath"
 }
 
@@ -77,10 +88,13 @@ function link
          -o $kernelPath \
          -ffreestanding \
          -O2 \
-         -nostdlib  $objList \
-         -lgcc || fail "Link failed."
+         -nostdlib  \
+         -m32 \
+         -lgcc \
+         $objList || fail "Link failed."
 }
 
+         #-melf_i386 \
 
 
 function checkMultiBoot
